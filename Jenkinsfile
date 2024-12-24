@@ -1,4 +1,3 @@
-
 pipeline {
     agent { label 'built-in' }
 
@@ -23,7 +22,7 @@ pipeline {
                             changes.addAll(entry.affectedPaths)
                         }
                     }
-                    
+
                     // Log the detected changes
                     echo "Detected changes: ${changes}"
 
@@ -31,33 +30,38 @@ pipeline {
                     def backendChanged = changes.any { it.startsWith('backend/') }
                     def package1Changed = changes.any { it.startsWith('pack1/') }
                     def package2Changed = changes.any { it.startsWith('pack2/') }
+                    def mobileAppChanged = changes.any { it.startsWith('mobileapp/') }
 
                     // Log folder-specific changes
                     echo "Backend folder changes: ${backendChanged}"
                     echo "Package 1 folder changes: ${package1Changed}"
                     echo "Package 2 folder changes: ${package2Changed}"
+                    echo "MobileApp folder changes: ${mobileAppChanged}"
 
-                    // Trigger backend pipeline if changes are in the backend folder
-                    // if (backendChanged) {
-                    //     build(job: 'backend-pipeline', parameters: [string(name: 'BRANCH', value: env.BRANCH_NAME)])
-                    // }
+                    // Determine which jobs to echo based on changes
+                    def triggeredJobs = []
 
-                    // // Trigger package1 pipeline if changes are in the package1 folder
-                    // if (package1Changed) {
-                    //     build(job: 'package1-pipeline', parameters: [string(name: 'BRANCH', value: env.BRANCH_NAME)])
-                    // }
+                    if (package1Changed) {
+                        echo "Job to execute: package1-pipeline"
+                        echo "Job to execute: mobileapp-pipeline"
+                        triggeredJobs.add('pack1')
+                    }
 
-                    // // Trigger package2 pipeline if changes are in the package2 folder
-                    // if (package2Changed) {
-                    //     build(job: 'package2-pipeline', parameters: [string(name: 'BRANCH', value: env.BRANCH_NAME)])
-                    // }
+                    if (package2Changed) {
+                        echo "Job to execute: package2-pipeline"
+                        echo "Job to execute: mobileapp-pipeline"
+                        triggeredJobs.add('pack2')
+                    }
 
-                    // // Stop the pipeline if no relevant changes are detected
-                    // if (!backendChanged && !package1Changed && !package2Changed) {
-                    //     echo "No relevant changes detected. Exiting pipeline."
-                    //     currentBuild.result = 'SUCCESS'
-                    //     return
-                    // }
+                    if (mobileAppChanged && !triggeredJobs.contains('pack1') && !triggeredJobs.contains('pack2')) {
+                        echo "Job to execute: mobileapp-pipeline only"
+                    }
+
+                    if (!backendChanged && !package1Changed && !package2Changed && !mobileAppChanged) {
+                        echo "No relevant changes detected. Exiting pipeline."
+                        currentBuild.result = 'SUCCESS'
+                        return
+                    }
                 }
             }
         }
