@@ -29,8 +29,8 @@ pipeline {
 
                     // Initialize flags for folder changes
                     def backendChanged = changes.any { it.startsWith('backend/') }
-                    def package1Changed = changes.any { it.startsWith('pack2/') }
-                    def package2Changed = changes.any { it.startsWith('pack3/') }
+                    def package1Changed = changes.any { it.startsWith('pack1/') }
+                    def package2Changed = changes.any { it.startsWith('pack2/') }
 
                     // Log folder-specific changes
                     echo "Backend folder changes: ${backendChanged}"
