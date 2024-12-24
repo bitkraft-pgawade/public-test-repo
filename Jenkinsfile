@@ -1,10 +1,6 @@
 pipeline {
     agent { label 'built-in' }
 
-    triggers {
-        pollSCM('H/10 * * * *') // Polls SCM every 10 minutes
-    }
-
     stages {
         stage('Checkout Code') {
             steps {
