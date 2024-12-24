@@ -11,6 +11,7 @@ COPY package*.json ./
 RUN npm install
 
 # Copy the rest of the application code
+# test
 COPY . .
 
 # Expose the port the app runs on
